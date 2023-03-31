@@ -14,7 +14,7 @@ if strategy.position_size > 0
 Periods1 = input(title='ATR Period 1', defval=12)
 src1 = input(ohlc4, title='Source 1')
 Multiplier1 = input.float(title='ATR Multiplier 1', step=0.1, defval=3.0)
-changeATR1 = input(title='Change ATR Calculation Method 1?', defval=true)
+changeATR1 = input(title='On = ta.atr(Preiods1) Off = ta.sma(ta.tr, Periods1)', defval=true)
 atr1 = changeATR1 ? ta.atr(Periods1) : ta.sma(ta.tr, Periods1)
 up1 = src1 - Multiplier1 * atr1
 up11 = nz(up1[1], up1)
@@ -41,7 +41,7 @@ fill(mPlot1, dnPlot1, title='Down Trend 1 Highligter', color=color.new(shortFill
 Periods2 = input(title='ATR Period 2', defval=11)
 src2 = input(ohlc4, title='Source 2')
 Multiplier2 = input.float(title='ATR Multiplier 2', step=0.1, defval=2.0)
-changeATR2 = input(title='Change ATR Calculation Method 2?', defval=true)
+changeATR2 = input(title='On = ta.atr(Preiods2) Off = ta.sma(ta.tr, Periods2)', defval=true)
 atr2 = changeATR2 ? ta.atr(Periods2) : ta.sma(ta.tr, Periods2)
 up2 = src2 - Multiplier2 * atr2
 up12 = nz(up2[1], up2)
@@ -68,7 +68,7 @@ fill(mPlot2, dnPlot2, title='Down Trend 2 Highligter', color=color.new(shortFill
 Periods3 = input(title='ATR Period 3', defval=10)
 src3 = input(ohlc4, title='Source 3')
 Multiplier3 = input.float(title='ATR Multiplier 3', step=0.1, defval=1.0)
-changeATR3 = input(title='Change ATR Calculation Method 3?', defval=true)
+changeATR3 = input(title='On = ta.atr(Preiods3) Off = ta.sma(ta.tr, Periods3)', defval=true)
 atr3 = changeATR3 ? ta.atr(Periods3) : ta.sma(ta.tr, Periods3)
 up3 = src3 - Multiplier3 * atr3
 up13 = nz(up3[1], up3)
