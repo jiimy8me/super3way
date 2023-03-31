@@ -3,11 +3,11 @@ strategy("Super 3-Way", overlay=true)
 
 // Add Stop Loss
 if strategy.position_size < 0
-    stop_loss = strategy.position_avg_price * 1.1
+    stop_loss = strategy.position_avg_price * 1.05
     strategy.exit("Stop Loss", "Short", loss=stop_loss)
     
 if strategy.position_size > 0
-    stop_loss = strategy.position_avg_price * 0.9
+    stop_loss = strategy.position_avg_price * 0.95
     strategy.exit("Stop Loss", "Long", loss=stop_loss)
 
 // Super Trend 1
