@@ -1,25 +1,16 @@
 //@version=5
 strategy("Super 3-Way", overlay=true)
 
-// Add Stop Loss
-if strategy.position_size < 0
-    stop_loss = strategy.position_avg_price * 1.05
-    strategy.exit("Stop Loss", "Short", loss=stop_loss)
-    
-if strategy.position_size > 0
-    stop_loss = strategy.position_avg_price * 0.95
-    strategy.exit("Stop Loss", "Long", loss=stop_loss)
-
-// Super Trend 1
+// superTrend1
 Periods1 = input(title='ATR Period 1', defval=12)
 src1 = input(ohlc4, title='Source 1')
 Multiplier1 = input.float(title='ATR Multiplier 1', step=0.1, defval=3.0)
 changeATR1 = input(title='On = ta.atr(Preiods1) Off = ta.sma(ta.tr, Periods1)', defval=true)
 atr1 = changeATR1 ? ta.atr(Periods1) : ta.sma(ta.tr, Periods1)
-up1 = src1 - Multiplier1 * atr1
+up1 = src1 - (Multiplier1 * atr1)
 up11 = nz(up1[1], up1)
 up1 := close[1] > up11 ? math.max(up1, up11) : up1
-dn1 = src1 + Multiplier1 * atr1
+dn1 = src1 + (Multiplier1 * atr1)
 dn11 = nz(dn1[1], dn1)
 dn1 := close[1] < dn11 ? math.min(dn1, dn11) : dn1
 trend1 = 1
@@ -37,16 +28,16 @@ shortFillColor1 = color.purple
 fill(mPlot1, upPlot1, title='Up Trend 1 Highligter', color=color.new(longFillColor1, 90))
 fill(mPlot1, dnPlot1, title='Down Trend 1 Highligter', color=color.new(shortFillColor1, 90))
 
-// Super Trend 2
+// superTrend2
 Periods2 = input(title='ATR Period 2', defval=11)
 src2 = input(ohlc4, title='Source 2')
 Multiplier2 = input.float(title='ATR Multiplier 2', step=0.1, defval=2.0)
 changeATR2 = input(title='On = ta.atr(Preiods2) Off = ta.sma(ta.tr, Periods2)', defval=true)
 atr2 = changeATR2 ? ta.atr(Periods2) : ta.sma(ta.tr, Periods2)
-up2 = src2 - Multiplier2 * atr2
+up2 = src2 - (Multiplier2 * atr2)
 up12 = nz(up2[1], up2)
 up2 := close[1] > up12 ? math.max(up2, up12) : up2
-dn2 = src2 + Multiplier2 * atr2
+dn2 = src2 + (Multiplier2 * atr2)
 dn12 = nz(dn2[1], dn2)
 dn2 := close[1] < dn12 ? math.min(dn2, dn12) : dn2
 trend2 = 1
@@ -64,16 +55,16 @@ shortFillColor2 = color.purple
 fill(mPlot2, upPlot2, title='Up Trend 2 Highligter', color=color.new(longFillColor2, 90))
 fill(mPlot2, dnPlot2, title='Down Trend 2 Highligter', color=color.new(shortFillColor2, 90))
 
-// Super Trend 3
+// superTrend3
 Periods3 = input(title='ATR Period 3', defval=10)
 src3 = input(ohlc4, title='Source 3')
 Multiplier3 = input.float(title='ATR Multiplier 3', step=0.1, defval=1.0)
 changeATR3 = input(title='On = ta.atr(Preiods3) Off = ta.sma(ta.tr, Periods3)', defval=true)
 atr3 = changeATR3 ? ta.atr(Periods3) : ta.sma(ta.tr, Periods3)
-up3 = src3 - Multiplier3 * atr3
+up3 = src3 - (Multiplier3 * atr3)
 up13 = nz(up3[1], up3)
 up3 := close[1] > up13 ? math.max(up3, up13) : up3
-dn3 = src3 + Multiplier3 * atr3
+dn3 = src3 + (Multiplier3 * atr3)
 dn13 = nz(dn3[1], dn3)
 dn3 := close[1] < dn13 ? math.min(dn3, dn13) : dn3
 trend3 = 1
@@ -99,22 +90,34 @@ dnTrend = (trend3 == -1) and (trend2 == -1) and (trend1 == -1)
 brTup = ((trend3 == -1) and (trend2 == -1)) or ((trend3 == -1) and (trend1 == -1)) or ((trend2 == -1) and (trend1 == -1))
 brTdn = ((trend3 == 1) and (trend2 == 1)) or ((trend3 == 1) and (trend1 == 1)) or ((trend2 == 1) and (trend1 == 1))
 
-// Only enter long position if price closes above the 3 supertrends
+// only long if price closes above the 3 supertrends
 longRule = upTrend == true
-// Only enter short position if price closes below the 3 supertrends
+// only short if price closes below the 3 supertrends
 shortRule = dnTrend == true
 
-// Close long position if 2 of 3 Supertrends are down
+// close long if 2 of 3 Supertrends are down
 longExit = brTup == true
-// Close short position if 2 of 3 Supertrends are up
+// close short if 2 of 3 Supertrends are up
 shortExit = brTdn == true
 
-// Add strategy rules
+// strategy rules
 if longRule
     strategy.entry("Long", strategy.long)
-if longExit
-    strategy.close("Long", "Long Exit")
+    if strategy.position_size < 0
+        aEntry = strategy.position_avg_price
+        lEntry = (aEntry + (aEntry * 0.0007))
+        longStop = (lEntry - (lEntry * 0.05))
+        strategy.exit("Long Stop", "Long", loss=longStop)
+
 if shortRule
     strategy.entry("Short", strategy.short)
+    if strategy.position_size > 0
+        aEntry = strategy.position_avg_price
+        sEntry = (aEntry - (aEntry * 0.0007))
+        shortStop = (sEntry + (sEntry * 0.05))
+        strategy.exit("Short Stop", "Short", loss=shortStop)
+
+if longExit
+    strategy.close("Long", "Long Exit")
 if shortExit
     strategy.close("Short", "Short Exit")
